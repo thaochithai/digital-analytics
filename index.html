@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
 
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-P2NPD7TK');</script>
-<!-- End Google Tag Manager -->
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-P2NPD7TK');</script>
+    <!-- End Google Tag Manager -->
 
+
+    <!-- Website -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicommunication - Leading telecommunication provider</title>
+    <title>TelePractice - Your Digital Partner</title>
     <style>
         * {
             margin: 0;
@@ -511,15 +513,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
     </style>
 </head>
+
 <body>
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P2NPD7TK"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <!-- Header -->
+    <!-- Header -->
     <header class="header">
         <div class="nav-container">
-            <div class="logo" data-analytics="logo-click" onclick="showPage('home')">Chicommunication</div>
+            <div class="logo" data-analytics="logo-click" onclick="showPage('home')">TelePractice</div>
             <nav>
                 <ul class="nav-menu">
                     <li><a data-analytics="nav-home" onclick="showPage('home')">Home</a></li>
@@ -830,7 +834,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <section class="thank-you-page">
             <div class="container">
                 <h1>🎉 Order Confirmed!</h1>
-                <p>Thank you for choosing Chicommunication. Your order has been successfully placed.</p>
+                <p>Thank you for choosing TelePractice. Your order has been successfully placed.</p>
                 <div class="confirmation-number" id="orderNumber">Order #TP-2024-001</div>
                 <p>You'll receive a confirmation email shortly with installation details.</p>
                 <div style="margin-top: 2rem;">
@@ -843,8 +847,399 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; This page is for practicing Adobe Experience Platform only!</p>
+            <p>&copy; 2024 TelePractice. All rights reserved. | Perfect for Analytics Practice</p>
         </div>
     </footer>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let orderCounter = 1;
+
+        // Cart utility functions
+        function getCart() {
+            return JSON.parse(localStorage.getItem('cart') || '[]');
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function getCartTotal() {
+            const cart = getCart();
+            return cart.reduce((total, item) => total + item.price, 0);
+        }
+
+        // Page management with hash routing
+        function showPage(pageId) {
+            // Update URL hash
+            window.location.hash = pageId;
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Track page view
+            trackEvent('page_view', {
+                page: pageId,
+                timestamp: new Date().toISOString(),
+                url: window.location.href
+            });
+
+            // Special handling for checkout page
+            if (pageId === 'checkout') {
+                updateCheckoutSummary();
+                const cart = getCart();
+                if (cart.length === 0) {
+                    alert('Your cart is empty. Please add items first.');
+                    showPage('plans');
+                    return;
+                }
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Handle browser back/forward buttons
+        function handleHashChange() {
+            const hash = window.location.hash.substring(1);
+            const pageId = hash || 'home';
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            } else {
+                document.getElementById('home').classList.add('active');
+            }
+        }
+
+        // Cart functionality
+        function addToCart(planName, price) {
+            let cart = getCart();
+            
+            // Check if plan already exists in cart
+            const existingItem = cart.find(item => item.name === planName);
+            if (existingItem) {
+                alert('This plan is already in your cart!');
+                return;
+            }
+
+            const item = {
+                id: Date.now(),
+                name: planName,
+                price: price,
+                type: 'plan'
+            };
+            
+            cart.push(item);
+            saveCart(cart);
+            updateCartUI();
+            
+            trackEvent('add_to_cart', {
+                item_name: planName,
+                item_price: price,
+                cart_total: getCartTotal(),
+                timestamp: new Date().toISOString()
+            });
+
+            alert(`${planName} plan added to cart!`);
+        }
+
+        function removeFromCart(itemId) {
+            let cart = getCart();
+            const item = cart.find(item => item.id === itemId);
+            cart = cart.filter(item => item.id !== itemId);
+            
+            saveCart(cart);
+            updateCartUI();
+            
+            trackEvent('remove_from_cart', {
+                item_name: item ? item.name : 'unknown',
+                item_price: item ? item.price : 0,
+                cart_total: getCartTotal(),
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function updateCartUI() {
+            const cart = getCart();
+            
+            // Update cart count
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = cart.length;
+            }
+            
+            // Update cart items display
+            const cartItemsContainer = document.getElementById('cartItems');
+            if (cartItemsContainer) {
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<div style="text-align: center; padding: 3rem; color: #666;"><h3>Your cart is empty</h3><p>Browse our plans to get started!</p></div>';
+                } else {
+                    cartItemsContainer.innerHTML = cart.map(item => `
+                        <div class="cart-item">
+                            <div class="item-info">
+                                <h4>${item.name} Plan</h4>
+                                <p>Monthly subscription</p>
+                            </div>
+                            <div class="item-price">€${item.price.toFixed(2)}/month</div>
+                            <button class="remove-btn" onclick="removeFromCart(${item.id})" data-analytics="remove-from-cart">Remove</button>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            // Update cart total
+            const cartTotal = document.getElementById('cartTotal');
+            if (cartTotal) {
+                cartTotal.textContent = `Total: €${getCartTotal().toFixed(2)}/month`;
+            }
+            
+            // Update checkout button
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            if (checkoutBtn) {
+                if (cart.length === 0) {
+                    checkoutBtn.disabled = true;
+                    checkoutBtn.style.opacity = '0.5';
+                } else {
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.style.opacity = '1';
+                }
+            }
+        }
+
+        // Checkout functionality
+        function nextStep(step) {
+            // Validate current step
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const inputs = currentStepElement.querySelectorAll('input[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#dc3545';
+                } else {
+                    input.style.borderColor = '#e9ecef';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Hide current step
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('completed');
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Show next step
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).style.display = 'block';
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+            
+            trackEvent('checkout_step', {
+                step: currentStep,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function previousStep(step) {
+            // Hide current step
+            document.getElementById(`step${currentStep}`).style.display = 'none';
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+            
+            // Show previous step
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).style.display = 'block';
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+            document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('completed');
+        }
+
+        function updateCheckoutSummary() {
+            const cart = getCart();
+            const summaryContainer = document.getElementById('checkoutSummary');
+            if (!summaryContainer || cart.length === 0) return;
+            
+            const summaryHTML = cart.map(item => `
+                <div class="summary-item">
+                    <span>${item.name} Plan</span>
+                    <span>€${item.price.toFixed(2)}/month</span>
+                </div>
+            `).join('') + `
+                <div class="summary-total">
+                    <span>Monthly Total</span>
+                    <span>€${getCartTotal().toFixed(2)}</span>
+                </div>
+            `;
+            
+            summaryContainer.innerHTML = summaryHTML;
+        }
+
+        // Analytics tracking
+        function trackEvent(eventName, properties = {}) {
+            console.log('Analytics Event:', eventName, properties);
+            
+            // Example Adobe Analytics implementation:
+            // if (typeof s !== 'undefined') {
+            //     s.linkTrackVars = 'prop1,eVar1,events';
+            //     s.linkTrackEvents = 'event1';
+            //     s.prop1 = properties.category || eventName;
+            //     s.eVar1 = properties.action || eventName;
+            //     s.events = 'event1';
+            //     s.tl(this, 'o', eventName);
+            // }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize cart UI
+            updateCartUI();
+            
+            // Handle initial page load
+            handleHashChange();
+            
+            // Track page load
+            trackEvent('page_load', {
+                page: window.location.hash.substring(1) || 'home',
+                timestamp: new Date().toISOString(),
+                user_agent: navigator.userAgent
+            });
+
+            // Add form submission handlers
+            const checkoutForm = document.getElementById('checkoutForm');
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const cart = getCart();
+                    const formData = new FormData(this);
+                    const orderNumber = `TP-2024-${String(orderCounter++).padStart(3, '0')}`;
+                    
+                    // Track purchase
+                    trackEvent('purchase', {
+                        order_id: orderNumber,
+                        revenue: getCartTotal(),
+                        items: cart.map(item => ({
+                            name: item.name,
+                            price: item.price,
+                            category: 'telecom_plan'
+                        })),
+                        customer_email: formData.get('email'),
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Update order number
+                    const orderNumberElement = document.getElementById('orderNumber');
+                    if (orderNumberElement) {
+                        orderNumberElement.textContent = `Order #${orderNumber}`;
+                    }
+                    
+                    // Clear cart
+                    localStorage.removeItem('cart');
+                    updateCartUI();
+                    currentStep = 1;
+                    
+                    // Reset form and steps
+                    this.reset();
+                    document.getElementById('step3').style.display = 'none';
+                    document.getElementById('step1').style.display = 'block';
+                    document.querySelectorAll('.progress-step').forEach(step => {
+                        step.classList.remove('active', 'completed');
+                    });
+                    document.querySelector('.progress-step[data-step="1"]').classList.add('active');
+                    
+                    showPage('thankyou');
+                });
+            }
+
+            // Contact form handler
+            const contactForm = document.querySelector('#contact .contact-form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    
+                    trackEvent('contact_form_submit', {
+                        service_interest: formData.get('service'),
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    alert('Thank you for your message! We\'ll get back to you soon.');
+                    this.reset();
+                });
+            }
+        });
+
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Initialize page on load
+        window.addEventListener('load', function() {
+            handleHashChange();
+        });
+
+        // Track all clicks with data-analytics attributes
+        document.addEventListener('click', function(e) {
+            const analyticsAttr = e.target.getAttribute('data-analytics');
+            if (analyticsAttr) {
+                const serviceType = e.target.getAttribute('data-service-type');
+                const planType = e.target.getAttribute('data-plan-type');
+                
+                trackEvent('click', {
+                    element: analyticsAttr,
+                    serviceType: serviceType,
+                    planType: planType,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        });
+
+        // Format card inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format card number input
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || '';
+                    e.target.value = formattedValue;
+                });
+            }
+
+            // Format expiry date input
+            const expiryInput = document.getElementById('expiryDate');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // CVV input validation
+            const cvvInput = document.getElementById('cvv');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
